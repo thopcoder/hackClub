@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Website with Multiple Shapes and Animations</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create shapes
+        const shapes = [];
+
+        // Cube 1
+        const cube1 = new THREE.Mesh(
+            new THREE.BoxGeometry(),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        );
+        cube1.position.x = -2;
+        shapes.push(cube1);
+
+        // Cube 2
+        const cube2 = new THREE.Mesh(
+            new THREE.BoxGeometry(0.8, 0.8, 0.8),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        );
+        cube2.position.x = 2;
+        shapes.push(cube2);
+
+        // Sphere
+        const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0x0000ff })
+        );
+        sphere.position.y = 2;
+        shapes.push(sphere);
+
+        // Torus
+        const torus = new THREE.Mesh(
+            new THREE.TorusGeometry(0.5, 0.2, 16, 100),
+            new THREE.MeshBasicMaterial({ color: 0xffff00 })
+        );
+        torus.position.y = -2;
+        shapes.push(torus);
+
+        // Add shapes to the scene
+        shapes.forEach(shape => scene.add(shape));
+
+        camera.position.z = 5;
+
+        // Animation function
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Animate shapes
+            const time = Date.now() * 0.001;
+
+            shapes.forEach((shape, index) => {
+                // Rotate
+                shape.rotation.x += 0.01 * (index + 1);
+                shape.rotation.y += 0.01 * (index + 1);
+
+                // Change color
+                const r = Math.sin(time + index) * 0.5 + 0.5;
+                const g = Math.sin(time * 0.5 + index) * 0.5 + 0.5;
+                const b = Math.sin(time * 0.3 + index) * 0.5 + 0.5;
+                shape.material.color.setRGB(r, g, b);
+
+                // Move in a circle (except for the torus)
+                if (index < 3) {
+                    const radius = 0.5;
+                    shape.position.x = Math.cos(time * (index + 1)) * radius + shape.position.x;
+                    shape.position.z = Math.sin(time * (index + 1)) * radius;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resizing
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
